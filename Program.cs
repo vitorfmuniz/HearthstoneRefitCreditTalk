@@ -1,2 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿var hearthstoneApiBaseUrl = "https://omgvamp-hearthstone-v1.p.rapidapi.com";
+
+var hearthstoneApiClient = RestService
+    .For<IHearthStoneApi>(hearthstoneApiBaseUrl);
+
+var cards = await hearthstoneApiClient.GetCardsByRarity(CardRarity.Free);
+
+cards
+    .PrintJson();
