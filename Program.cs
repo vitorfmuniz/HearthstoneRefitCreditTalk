@@ -1,9 +1,16 @@
-﻿var hearthstoneApiBaseUrl = "https://omgvamp-hearthstone-v1.p.rapidapi.com";
+﻿#region Configuration
+var builder = new ConfigurationBuilder();
+var memoryCollection = new Dictionary<string, string>();
+memoryCollection.Add("HearthStoneBaseAddress", "https://omgvamp-hearthstone-v1.p.rapidapi.com");
+builder.AddInMemoryCollection(memoryCollection);
+var configuration = builder.Build();
+var serviceCollection = new ServiceCollection();
+#endregion Configuration
 
-var hearthstoneApiClient = RestService
-    .For<IHearthStoneApi>(hearthstoneApiBaseUrl,
-#region Setttings
-    new RefitSettings
+#region Dependency Injection
+serviceCollection.AddSingleton<IConfiguration>(configuration);
+serviceCollection
+    .AddRefitClient<IHearthStoneApi>(new RefitSettings
     {
         ContentSerializer = new NewtonsoftJsonContentSerializer(new JsonSerializerSettings
         {
@@ -11,8 +18,17 @@ var hearthstoneApiClient = RestService
             MissingMemberHandling = MissingMemberHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore,
         })
+    })
+    .ConfigureHttpClient((s, c) =>
+    {
+        var config = s.GetService<IConfiguration>();
+        var baseAddress = config.GetRequiredSection("HearthStoneBaseAddress").Value;
+        c.BaseAddress = new Uri(baseAddress);
     });
-#endregion Setttings
+#endregion Dependency Injection
+
+var serviceProvider = serviceCollection.BuildServiceProvider();
+var hearthstoneApiClient = serviceProvider.GetRequiredService<IHearthStoneApi>();
 
 var cards = await hearthstoneApiClient.GetCardsByName("Animal Companion");
 cards.PrintJson();
