@@ -9,4 +9,5 @@ public enum CardType
     Hero,
     HeroPower,
     Enchantment,
+    Location,
 }

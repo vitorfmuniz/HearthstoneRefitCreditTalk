@@ -1,18 +1,16 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using JsonConverter = Newtonsoft.Json.JsonConverter;
 
 namespace HearthstoneRefitCreditTalk.Extenstions;
 
 public static class ConsoleLogExtentions
 {
     public static void PrintJson<T>(this T @object)
-        => Console.WriteLine(JsonSerializer.Serialize(@object, new JsonSerializerOptions
+        => Console.WriteLine(JsonConvert.SerializeObject(@object, new JsonSerializerSettings
         {
-            WriteIndented = true,
-            Converters = { new JsonStringEnumConverter() }
-        }
-        ));
+            Formatting = Formatting.Indented,
+            Converters = new List<JsonConverter> { new StringEnumConverter() }
+        }));
 
-    public static void Print<T>(this T @object,string prefix = "")
+    public static void Print<T>(this T @object, string prefix = "")
         => Console.WriteLine($"{prefix}{@object?.ToString()}");
 }

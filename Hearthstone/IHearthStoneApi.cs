@@ -1,4 +1,4 @@
-namespace HearthstoneRefitCreditTalk.Hearthstone;
+﻿namespace HearthstoneRefitCreditTalk.Hearthstone;
 
 [Headers(
     "X-RapidAPI-Key: <PutYourApiKeyHere>",
@@ -12,11 +12,6 @@ public interface IHearthStoneApi
         [Query] CardSearchParams? @params = null,
         CancellationToken cancellationToken = default);
 
-    [Get("/cards/search/{name}")]
+    [Get("/cards/search/{name}?collectible=1")]
     public Task<IEnumerable<Card>> GetCardsByName(string name);
-
-    #region Not throwing
-    //[Get("/cards/search/{name}")]
-    //public Task<ApiResponse<IEnumerable<Card>>> GetCardsByName(string name);
-    #endregion  Not throwing
 }

@@ -4,3 +4,5 @@ global using HearthstoneRefitCreditTalk.Hearthstone.Models;
 global using HearthstoneRefitCreditTalk.Extenstions;
 global using HearthstoneRefitCreditTalk.Hearthstone.SearchParameters;
 global using System.Text.Json;
+global using Newtonsoft.Json;
+global using Newtonsoft.Json.Converters;
