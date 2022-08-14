@@ -11,7 +11,7 @@ var serviceCollection = new ServiceCollection();
 #region Dependency Injection
 serviceCollection.AddScoped<HearthstoneApiKeyInjectorDelegatingHandler>();
 serviceCollection.AddSingleton<IConfiguration>(configuration);
-serviceCollection
+var httpClientBuilder = serviceCollection
     .AddRefitClient<IHearthStoneApi>(new RefitSettings
     {
         ContentSerializer = new NewtonsoftJsonContentSerializer(new JsonSerializerSettings
@@ -26,12 +26,31 @@ serviceCollection
         var config = s.GetService<IConfiguration>();
         var baseAddress = config.GetRequiredSection("HearthStoneBaseAddress").Value;
         c.BaseAddress = new Uri(baseAddress);
-    })
-    .AddHttpMessageHandler<HearthstoneApiKeyInjectorDelegatingHandler>();
+    });
 #endregion Dependency Injection
+
+#region Microsoft.Extensions.Http.Polly
+var retryPolicy = HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+        .WaitAndRetryAsync(3, retryAttempt =>
+        {
+            retryAttempt.Print("Attempt: ");
+            return TimeSpan.FromSeconds(Math.Pow(2, retryAttempt));
+        });
+httpClientBuilder.AddHttpMessageHandler<HearthstoneApiKeyInjectorDelegatingHandler>();
+httpClientBuilder.AddPolicyHandler(retryPolicy);
+#endregion Microsoft.Extensions.Http.Polly
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 var hearthstoneApiClient = serviceProvider.GetRequiredService<IHearthStoneApi>();
 
-var cards = await hearthstoneApiClient.GetCardsByName("Animal Companion");
-cards.PrintJson();
+try
+{
+    var cards = await hearthstoneApiClient.GetCardsByName("xpto");
+    cards.PrintJson();
+}
+catch (ApiException e)
+{
+    (await e.GetContentAsAsync<HearthstoneError>()).Print("GetContentAsAsync: ");
+}
