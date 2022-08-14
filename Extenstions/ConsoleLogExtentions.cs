@@ -12,4 +12,7 @@ public static class ConsoleLogExtentions
             Converters = { new JsonStringEnumConverter() }
         }
         ));
+
+    public static void Print<T>(this T @object,string prefix = "")
+        => Console.WriteLine($"{prefix}{@object?.ToString()}");
 }

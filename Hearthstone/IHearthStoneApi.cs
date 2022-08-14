@@ -11,4 +11,12 @@ public interface IHearthStoneApi
         [AliasAs("quality")] CardRarity rarity,
         [Query] CardSearchParams? @params = null,
         CancellationToken cancellationToken = default);
+
+    [Get("/cards/search/{name}")]
+    public Task<IEnumerable<Card>> GetCardsByName(string name);
+
+    #region Not throwing
+    //[Get("/cards/search/{name}")]
+    //public Task<ApiResponse<IEnumerable<Card>>> GetCardsByName(string name);
+    #endregion  Not throwing
 }
