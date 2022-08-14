@@ -7,5 +7,8 @@ namespace HearthstoneRefitCreditTalk.Hearthstone;
 public interface IHearthStoneApi
 {
     [Get("/cards/qualities/{quality}?collectible=1")]
-    public Task<IEnumerable<Card>> GetCardsByRarity([AliasAs("quality")] CardRarity rarity, [Query] CardSearchParams? @params = null);
+    public Task<IEnumerable<Card>> GetCardsByRarity(
+        [AliasAs("quality")] CardRarity rarity,
+        [Query] CardSearchParams? @params = null,
+        CancellationToken cancellationToken = default);
 }
